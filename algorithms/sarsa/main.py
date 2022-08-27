@@ -129,6 +129,7 @@ class Runner():
                 f"episode: {episode}, steps: {ep_step}, reward: {ep_reward}"
             )
         logging.info(f"End Training! {config.train.n_episode} Episodes!")
+        env.close()
         agent.save_model(args.log_path+"/") 
 
     def test(self):
@@ -159,5 +160,6 @@ class Runner():
                 f"episode: {episode}, steps: {ep_step}, reward: {ep_reward}"
             ) 
         logging.info(f"End Training! {config.test.n_episode} Episodes!") 
+        env.close()
 
 
