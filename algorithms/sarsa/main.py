@@ -5,7 +5,7 @@ import logging
 from tqdm import tqdm
 import os
 
-from algorithms.QLearning.agent import Agent
+from algorithms.sarsa.agent import Agent
 
 
 class CliffWalkingWapper(gym.Wrapper):
@@ -99,7 +99,7 @@ class Runner():
 
     def set_env(self, env_name):
         env = gym.make(env_name)
-        if env_name == 'CliffWalking-v0':  
+        if env_name == 'CliffWalking-v0':
             env = CliffWalkingWapper(env)
         return env
 
@@ -114,7 +114,8 @@ class Runner():
             while True:
                 action = agent.sample_action(state, episode)
                 next_state, reward, done, _ = env.step(action)
-                agent.update(state, action, reward, next_state, done)
+                next_action = agent.sample_action(state, episode)
+                agent.update(state, action, reward, next_state, next_action, done)
                 state = next_state
                 ep_reward += reward
                 ep_step += 1
@@ -135,8 +136,10 @@ class Runner():
         agent, env = self.agent, self.env
         tb_logger = config.tb_logger 
         logging.info(f"Start Testing! Env: {config.env}, Algorithm: {args.alg}")
+        #state = env.reset()
         agent.load_model(args.log_path+"/")
         for episode in tqdm(range(config.test.n_episode), desc = 'Episodes'):
+        #for episode in range(config.test.n_episode):
             ep_reward, ep_step = 0, 0
             state = env.reset()
             while True:
@@ -149,6 +152,8 @@ class Runner():
                 #)
                 if done:
                     break
+                #if ep_step == 10:
+                #    break
             tb_logger.add_scalar("reward", ep_reward, global_step=episode)
             logging.info(
                 f"episode: {episode}, steps: {ep_step}, reward: {ep_reward}"
