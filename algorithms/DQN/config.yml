@@ -5,11 +5,14 @@ model:
   n_hiddens: 256
 
 train:
-  lr: 0.1
-  n_episode: 400
-  device_ids: 5
+  lr: 0.0001
+  n_episode: 200
+  device_ids: 4
   batch_size: 64
-  buffer_size: 100000
+  buffer_size: 10000
+  tau: 0.8
+  grad_clip: 1.0
+  target_update: 4
 
 test:
   n_episode: 100
@@ -17,4 +20,4 @@ test:
 greedy:
   epsilon_start: 0.95
   epsilon_end: 0.01
-  epsilon_decay: 300
+  epsilon_decay: 500

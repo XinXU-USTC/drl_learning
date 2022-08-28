@@ -89,6 +89,7 @@ class CliffWalkingWapper(gym.Wrapper):
 class Runner():
     def __init__(self, args, config):
         self.env = self.set_env(config.env)
+        self.env.seed(args.seed)
         self.args = args
         self.config = config
         self.n_states = self.env.observation_space.n
