@@ -14,7 +14,7 @@ train:
   buffer_size: 10000
   tau: 0.8
   grad_clip: 1.0
-  target_update: 2
+  target_update: 4
 
 test:
   n_episode: 100
