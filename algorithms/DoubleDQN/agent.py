@@ -85,8 +85,8 @@ class Agent():
         #    param.grad.data.clamp_(-1, 1)
         nn.utils.clip_grad_norm_(self.policy_net.parameters(), self.config.train.grad_clip)
         self.optimizer.step()
-        #for target_param, param in zip(self.target_net.parameters(), self.policy_net.parameters()):
-        #    target_param = target_param * (1 - self.config.train.tau) + self.config.train.tau * param
+        for target_param, param in zip(self.target_net.parameters(), self.policy_net.parameters()):
+            target_param = target_param * (1 - self.config.train.tau) + self.config.train.tau * param
 
 
     def sample_action(self, state, episode):

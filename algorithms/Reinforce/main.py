@@ -6,7 +6,7 @@ import os
 import torch
 import torch.nn as nn
 import random
-from algorithms.DoubleDQN.agent import Agent
+from algorithms.Reinforce.agent import Agent
 #os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 #os.environ["CUDA_VISIBLE_DEVICES"] = "1, 2, 4, 5, 6, 7, 8"
 
@@ -34,26 +34,21 @@ class Runner():
         logging.info(f"Start Training! Env: {config.env}, Algorithm: {args.alg}")
 
         agent.policy_net = nn.DataParallel(agent.policy_net, device_ids=range(config.train.device_ids))
-        agent.target_net = nn.DataParallel(agent.target_net, device_ids=range(config.train.device_ids))
         
         for episode in tqdm(range(config.train.n_episode), desc = 'Episodes'):
             ep_reward, ep_step = 0, 0
             state = env.reset()
             while True:
-                action = agent.sample_action(state, episode)
+                action = agent.sample_action(state)
                 next_state, reward, done, _ = env.step(action)
-                agent.replay.push(state, action, reward, next_state, done)
-                agent.update()
+                agent.replay.push(state, action, reward)
                 state = next_state
                 ep_reward += reward
                 ep_step += 1
-                #logging.info(
-                #    f"episode: {episode}, step: {ep_step}, reward: {reward}, accum_reward: {ep_reward}"
-                #)
                 if done:
                     break
-            #if (episode + 1) % self.config.train.target_update == 0:
-            #    agent.target_net.load_state_dict(agent.policy_net.state_dict())
+            agent.update()
+            agent.replay.reset()
             tb_logger.add_scalar("reward", ep_reward, global_step=episode)
             logging.info(
                 f"episode: {episode}, steps: {ep_step}, reward: {ep_reward}"
@@ -77,9 +72,6 @@ class Runner():
                 state, reward, done, _ = env.step(action)
                 ep_reward += reward
                 ep_step += 1
-                #logging.info(
-                #    f"episode: {episode}, step: {ep_step}, reward: {reward}, accum_reward: {ep_reward}"
-                #)
                 if done:
                     break
             tb_logger.add_scalar("reward", ep_reward, global_step=episode)

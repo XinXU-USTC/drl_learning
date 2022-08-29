@@ -6,7 +6,7 @@ greedy: !!python/object:argparse.Namespace
   epsilon_end: 0.01
   epsilon_start: 0.95
 model: !!python/object:argparse.Namespace
-  n_hiddens: 128
+  n_hiddens: 256
 test: !!python/object:argparse.Namespace
   n_episode: 100
 train: !!python/object:argparse.Namespace
@@ -14,7 +14,7 @@ train: !!python/object:argparse.Namespace
   buffer_size: 10000
   device_ids: 4
   grad_clip: 1.0
-  lr: 0.0001
+  lr: 0.0002
   n_episode: 200
   target_update: 4
-  tau: 0.99
+  tau: 0.01
