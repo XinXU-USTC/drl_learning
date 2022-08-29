@@ -52,8 +52,8 @@ class Runner():
                 #)
                 if done:
                     break
-            #if (episode + 1) % self.config.train.target_update == 0:
-            #    agent.target_net.load_state_dict(agent.policy_net.state_dict())
+            if (episode + 1) % self.config.train.target_update == 0:
+                agent.target_net.load_state_dict(agent.policy_net.state_dict())
             tb_logger.add_scalar("reward", ep_reward, global_step=episode)
             logging.info(
                 f"episode: {episode}, steps: {ep_step}, reward: {ep_reward}"

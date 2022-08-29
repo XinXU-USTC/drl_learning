@@ -14,7 +14,7 @@ train: !!python/object:argparse.Namespace
   buffer_size: 10000
   device_ids: 4
   grad_clip: 1.0
-  lr: 0.0002
+  lr: 0.0001
   n_episode: 200
   target_update: 4
   tau: 0.01

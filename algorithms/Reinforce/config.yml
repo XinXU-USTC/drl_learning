@@ -7,7 +7,7 @@ model:
   n_hiddens: 256
 
 train:
-  lr: 0.00001
+  lr: 0.0001
   n_episode: 200
   device_ids: 4
   #batch_size: 128

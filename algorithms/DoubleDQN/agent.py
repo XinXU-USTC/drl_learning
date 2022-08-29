@@ -76,8 +76,9 @@ class Agent():
         state, action, reward, next_state, done = state.to(device), action.to(device), reward.to(device), next_state.to(device), done.to(device)
         q_value = self.policy_net(state).gather(dim=1, index=action)
         next_q_value = self.policy_net(next_state).detach()
-        next_max_q_value = self.target_net(next_state).gather(dim=1, index=next_q_value.max(1)[1].unsqueeze(1)).unsqueeze(1)
+        next_max_q_value = self.target_net(next_state).gather(dim=1, index=next_q_value.max(1)[1].unsqueeze(1))
         q_target = reward + self.config.gamma * next_max_q_value * (1 - done)
+        #print(q_value.shape, next_max_q_value.shape)
         loss = self.loss(q_value, q_target)
         self.optimizer.zero_grad()
         loss.backward()
@@ -85,8 +86,8 @@ class Agent():
         #    param.grad.data.clamp_(-1, 1)
         nn.utils.clip_grad_norm_(self.policy_net.parameters(), self.config.train.grad_clip)
         self.optimizer.step()
-        for target_param, param in zip(self.target_net.parameters(), self.policy_net.parameters()):
-            target_param = target_param * (1 - self.config.train.tau) + self.config.train.tau * param
+        #for target_param, param in zip(self.target_net.parameters(), self.policy_net.parameters()):
+        #    target_param = target_param * (1 - self.config.train.tau) + self.config.train.tau * param
 
 
     def sample_action(self, state, episode):
