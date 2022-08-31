@@ -1,13 +1,13 @@
 env: 'CartPole-v0'
 #env: 'CartPole-v1'
 #env: 'Acrobot-v1'
-gamma: 0.9
+gamma: 0.99
 
 model:
-  n_hiddens: 256
+  n_hiddens: 32
 
 train:
-  lr: 0.0001
+  lr: 0.005
   n_episode: 200
   device_ids: 4
   #batch_size: 128

@@ -44,12 +44,14 @@ class Runner():
                 action = agent.sample_action(state)
                 next_state, reward, done, _ = env.step(action)
                 next_action = agent.sample_action(next_state)
-                agent.update(state, action, reward, next_state, next_action, done)
+                agent.memory.push(state, action, reward, next_state, next_action, done)
                 state = next_state
                 ep_reward += reward
                 ep_step += 1
                 if done:
                     break
+            agent.update()
+            agent.memory.reset()
             if (episode + 1) % self.config.train.target_update == 0:
                 agent.syn_target()
             tb_logger.add_scalar("reward", ep_reward, global_step=episode)

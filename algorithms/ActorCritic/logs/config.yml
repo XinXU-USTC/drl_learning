@@ -1,6 +1,6 @@
 !!python/object:argparse.Namespace
 env: CartPole-v0
-gamma: 0.9
+gamma: 0.99
 greedy: !!python/object:argparse.Namespace
   epsilon_decay: 2000
   epsilon_end: 0.01

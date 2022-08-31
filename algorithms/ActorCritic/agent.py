@@ -6,6 +6,31 @@ import numpy as np
 import logging
 from torch.distributions import Categorical
 
+class ReplayBuffer():
+    def __init__(self, config):
+        self.buffer = []
+        self.config = config
+    
+    def __len__(self):
+        return len(self.buffer)
+
+    def push(self, state, action, reward, next_state, next_action, done):
+        self.buffer.append((state, action, reward, next_state, next_action, done))
+
+    def sample(self):
+        batch = self.buffer
+        state, action, reward, next_state, next_action, done = zip(*batch)
+        state = torch.tensor(np.array(state), dtype=torch.float)
+        action = torch.tensor(action).unsqueeze(1)
+        reward = torch.tensor(reward, dtype=torch.float).unsqueeze(1)
+        next_state = torch.tensor(np.array(next_state), dtype=torch.float)
+        next_action = torch.tensor(next_action).unsqueeze(1)
+        done = torch.tensor(done).unsqueeze(1)
+        return state, action, reward, next_state, next_action, done
+
+    def reset(self):
+        self.buffer = []
+
 class Critic(nn.Module):
     def __init__(self, n_states, n_actions, n_hiddens):
         super(Critic, self).__init__()
@@ -42,6 +67,7 @@ class Agent():
         self.actor_net = Actor(self.n_states, self.n_actions, config.model.n_hiddens).to(config.device)
         self.syn_target()
         self.sample_count = 0
+        self.memory = ReplayBuffer(config)
         self.optimizer1 = optim.Adam(self.critic_net.parameters(), lr = self.config.train.lr)
         self.optimizer2 = optim.Adam(self.actor_net.parameters(), lr = self.config.train.lr)
         self.loss = nn.MSELoss()
@@ -62,19 +88,20 @@ class Agent():
             f=path+self.config.env+".pth"
         )
 
-    def update(self, state, action, reward, next_state, next_action, done):
+    def update(self):
         device = self.config.device
-        state = torch.tensor(np.array(state), dtype=torch.float).reshape(1, -1)
-        action = torch.tensor(action).reshape(1, 1)
-        next_action = torch.tensor(next_action).reshape(1, 1)
-        reward = torch.tensor(reward, dtype=torch.float).reshape(1, 1)
-        next_state = torch.tensor(np.array(next_state), dtype=torch.float).reshape(1, -1)
-        done = torch.tensor(done, dtype=torch.float).reshape(1, 1)
+        #state = torch.tensor(np.array(state), dtype=torch.float).reshape(1, -1)
+        #action = torch.tensor(action).reshape(1, 1)
+        #next_action = torch.tensor(next_action).reshape(1, 1)
+        #reward = torch.tensor(reward, dtype=torch.float).reshape(1, 1)
+        #next_state = torch.tensor(np.array(next_state), dtype=torch.float).reshape(1, -1)
+        #done = torch.tensor(done, dtype=torch.float).reshape(1, 1)
+        state, action, reward, next_state, next_action, done = self.memory.sample()
         state, action, reward, next_state, next_action, done = state.to(device), action.to(device), reward.to(device), next_state.to(device), next_action.to(device), done.to(device)
         #print(state.shape, action.shape, reward.shape, next_state.shape, next_action.shape, done.shape)
         q_value = self.critic_net(state).gather(dim=1, index=action)
         next_q_value = self.target_net(next_state).gather(dim=1, index=next_action).detach()
-        q_target = reward + self.config.gamma * next_q_value * (1 - done)
+        q_target = reward + self.config.gamma * next_q_value * (~done)
         loss1 = self.loss(q_value, q_target)
         self.optimizer1.zero_grad()
         loss1.sum().backward()

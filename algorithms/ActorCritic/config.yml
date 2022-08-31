@@ -1,7 +1,7 @@
 env: 'CartPole-v0'
 #env: 'CartPole-v1'
 #env: 'Acrobot-v1'
-gamma: 0.9
+gamma: 0.99
 
 model:
   n_hiddens: 256
