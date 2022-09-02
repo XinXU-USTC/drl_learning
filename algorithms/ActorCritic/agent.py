@@ -108,6 +108,7 @@ class Agent():
         nn.utils.clip_grad_norm_(self.critic_net.parameters(), self.config.train.grad_clip)
         self.optimizer1.step()
         probs = self.actor_net(state)
+        #print(probs)
         m = Categorical(probs)
         loss2 = -m.log_prob(action.squeeze(1)).unsqueeze(1)*(q_value.detach())
         #print(loss1.sum()==loss1)

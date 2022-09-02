@@ -50,8 +50,9 @@ class Runner():
                 ep_step += 1
                 if done:
                     break
-            agent.update()
-            agent.memory.reset()
+            if (episode + 1) % self.config.train.actor_update == 0:
+                agent.update()
+                agent.memory.reset()
             if (episode + 1) % self.config.train.target_update == 0:
                 agent.syn_target()
             tb_logger.add_scalar("reward", ep_reward, global_step=episode)

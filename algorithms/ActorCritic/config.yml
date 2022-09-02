@@ -14,7 +14,8 @@ train:
   #buffer_size: 100000
   #tau: 0.8
   grad_clip: 1.0
-  target_update: 4
+  target_update: 6
+  actor_update: 2
 
 test:
   n_episode: 100

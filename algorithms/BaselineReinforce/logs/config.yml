@@ -1,6 +1,6 @@
 !!python/object:argparse.Namespace
 env: CartPole-v0
-gamma: 0.999
+gamma: 0.99
 greedy: !!python/object:argparse.Namespace
   epsilon_decay: 2000
   epsilon_end: 0.01
@@ -13,5 +13,5 @@ train: !!python/object:argparse.Namespace
   device_ids: 4
   grad_clip: 1.0
   lr: 0.005
-  n_episode: 200
+  n_episode: 2000
   target_update: 4

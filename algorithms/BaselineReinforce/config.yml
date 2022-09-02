@@ -8,7 +8,7 @@ model:
 
 train:
   lr: 0.005
-  n_episode: 200
+  n_episode: 2000
   device_ids: 4
   #batch_size: 128
   #buffer_size: 10000
