@@ -25,7 +25,7 @@ class ReplayBuffer():
         reward = torch.tensor(reward, dtype=torch.float).unsqueeze(1)
         next_state = torch.tensor(np.array(next_state), dtype=torch.float)
         next_action = torch.tensor(next_action).unsqueeze(1)
-        done = torch.tensor(done).unsqueeze(1)
+        done = torch.tensor(done, dtype=torch.int).unsqueeze(1)
         return state, action, reward, next_state, next_action, done
 
     def reset(self):
@@ -68,8 +68,8 @@ class Agent():
         self.syn_target()
         self.sample_count = 0
         self.memory = ReplayBuffer(config)
-        self.optimizer1 = optim.Adam(self.critic_net.parameters(), lr = self.config.train.lr)
-        self.optimizer2 = optim.Adam(self.actor_net.parameters(), lr = self.config.train.lr)
+        self.optimizer1 = optim.Adam(self.critic_net.parameters(), lr = self.config.train.critic_lr)
+        self.optimizer2 = optim.Adam(self.actor_net.parameters(), lr = self.config.train.actor_lr)
         self.loss = nn.MSELoss()
 
     def load_model(self, path):
@@ -101,8 +101,8 @@ class Agent():
         #print(state.shape, action.shape, reward.shape, next_state.shape, next_action.shape, done.shape)
         q_value = self.critic_net(state).gather(dim=1, index=action)
         next_q_value = self.target_net(next_state).gather(dim=1, index=next_action).detach()
-        q_target = reward + self.config.gamma * next_q_value * (~done)
-        loss1 = self.loss(q_value, q_target)
+        q_target = reward + self.config.gamma * next_q_value * (1-done)
+        loss1 = 0.5*self.loss(q_value, q_target)
         self.optimizer1.zero_grad()
         loss1.sum().backward()
         nn.utils.clip_grad_norm_(self.critic_net.parameters(), self.config.train.grad_clip)
